@@ -1,6 +1,6 @@
 import NIOSSL
 import Fluent
-import FluentMongoDriver
+import FluentSQLiteDriver
 import Vapor
 
 // configures your application
@@ -8,9 +8,7 @@ public func configure(_ app: Application) async throws {
     // uncomment to serve files from /Public folder
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
-    try app.databases.use(.mongo(
-        connectionString: Environment.get("DATABASE_URL") ?? "mongodb://localhost:27017/vapor_database"
-    ), as: .mongo)
+    app.databases.use(.sqlite(.file("db.sqlite")), as: .sqlite)
 
     app.migrations.add(CreateTodo())
 
