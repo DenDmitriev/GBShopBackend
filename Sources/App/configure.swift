@@ -9,7 +9,7 @@ public func configure(_ app: Application) async throws {
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
     // Configure custom hostname.
-    app.http.server.configuration.hostname = "https://gbshopbackend-denisdmitriev.amvera.io"
+    // app.http.server.configuration.hostname = "hostname"
     // Configure custom port.
     app.http.server.configuration.port = 80
     
