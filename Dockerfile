@@ -74,4 +74,4 @@ EXPOSE 80
 
 # Start the Vapor service when the image is run, default to listening on 80 in production environment
 ENTRYPOINT ["./App"]
-CMD ["serve", "--env", "production", "--hostname", "https://gbshopbackend-denisdmitriev.amvera.io", "--port", "80"]
+CMD ["serve", "--env", "production", "--hostname", "0.0.0.0", "--port", "80"]
