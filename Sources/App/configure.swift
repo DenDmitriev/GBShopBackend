@@ -9,7 +9,7 @@ public func configure(_ app: Application) async throws {
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
     print(app.directory)
-    app.databases.use(.sqlite(.file("data/db.sqlite")), as: .sqlite)
+    app.databases.use(.sqlite(.file("app/data/db.sqlite")), as: .sqlite)
 
     app.migrations.add(CreateTodo())
 

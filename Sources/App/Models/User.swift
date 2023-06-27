@@ -13,9 +13,9 @@ final class User: Model, Content, Codable {
     
     @ID(key: .id) var id: UUID?
     
-    @Field(key: "user_login") var login: String
-    @Field(key: "user_name") var name: String
-    @Field(key: "user_lastname") var lastname: String
+    @Field(key: "login") var login: String
+    @Field(key: "name") var name: String
+    @Field(key: "lastname") var lastname: String
     @Field(key: "password") var password: String
     @Field(key: "email") var email: String
     @Field(key: "gender") var gender: String
@@ -23,10 +23,10 @@ final class User: Model, Content, Codable {
     @Field(key: "bio") var bio: String
     
     enum CodingKeys: String, CodingKey {
-        case id = "id_user"
-        case login = "user_login"
-        case name = "user_name"
-        case lastname = "user_lastname"
+        case id = "id"
+        case login = "login"
+        case name = "name"
+        case lastname = "lastname"
         case password = "password"
         case email = "email"
         case gender = "gender"
