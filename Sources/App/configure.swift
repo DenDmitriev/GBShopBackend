@@ -8,8 +8,9 @@ public func configure(_ app: Application) async throws {
     // uncomment to serve files from /Public folder
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
-    print(app.directory)
-    app.databases.use(.sqlite(.file("app/data/db.sqlite")), as: .sqlite)
+    let databasePath = app.directory.workingDirectory + "data/db.sqlite"
+    print("database exists on path", databasePath, FileManager.default.fileExists(atPath: databasePath))
+    app.databases.use(.sqlite(.file(databasePath)), as: .sqlite)
 
     app.migrations.add(CreateTodo())
 
