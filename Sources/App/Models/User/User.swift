@@ -13,14 +13,14 @@ final class User: Model, Content, Codable {
     
     @ID(key: .id) var id: UUID?
     
-    @Field(key: "login") var login: String
-    @Field(key: "name") var name: String
-    @Field(key: "lastname") var lastname: String
-    @Field(key: "password") var password: String
-    @Field(key: "email") var email: String
-    @Field(key: "gender") var gender: String
-    @Field(key: "credit_card") var creditCard: String
-    @Field(key: "bio") var bio: String
+    @Field(key: CodingKeys.login.fieldKey) var login: String
+    @Field(key: CodingKeys.name.fieldKey) var name: String
+    @Field(key: CodingKeys.lastname.fieldKey) var lastname: String
+    @Field(key: CodingKeys.password.fieldKey) var password: String
+    @Field(key: CodingKeys.email.fieldKey) var email: String
+    @Field(key: CodingKeys.gender.fieldKey) var gender: String
+    @Field(key: CodingKeys.creditCard.fieldKey) var creditCard: String
+    @Field(key: CodingKeys.bio.fieldKey) var bio: String
     
     enum CodingKeys: String, CodingKey {
         case id = "id"
@@ -32,6 +32,10 @@ final class User: Model, Content, Codable {
         case gender = "gender"
         case creditCard = "credit_card"
         case bio = "bio"
+        
+        var fieldKey: FieldKey {
+            return FieldKey(stringLiteral: self.stringValue)
+        }
     }
     
     init() { }
