@@ -149,11 +149,11 @@ struct UserController: RouteCollection {
     /// - Parameter id: UUID of user
     /// - Returns: LogoutResult model with value result: Int.
     func logout(req: Request) async throws -> LogoutResult {
-        let logoutRequest = try req.content.decode(LogoutRequest.self)
-        let userID = logoutRequest.id
-        guard let user = try await User.find(userID, on: req.db) else {
-            throw Abort(.notFound)
-        }
+//        let logoutRequest = try req.content.decode(LogoutRequest.self)
+//        let userID = logoutRequest.id
+//        guard let user = try await User.find(userID, on: req.db) else {
+//            throw Abort(.notFound)
+//        }
         // TODO: add logout func in Customer Service
         return .init(result: 1)
     }
