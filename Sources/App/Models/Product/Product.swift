@@ -17,19 +17,31 @@ final class Product: Model, Content, Codable {
     @Field(key: "price") var price: Float
     @Field(key: "description") var description: String
     
-    enum CodingKeys: String, CodingKey {
+    @Parent(key: Key.category.fieldKey) var category: ProductCategory
+    
+    enum Key: String {
         case id
         case name
         case price
         case description
+        case category = "category_id"
+        
+        var fieldKey: FieldKey {
+            return FieldKey(stringLiteral: self.rawValue)
+        }
     }
     
     init() {}
     
-    init(id: UUID? = nil, name: String, price: Float, description: String) {
+    init(id: UUID? = nil,
+         name: String,
+         price: Float,
+         description: String,
+         categoryID: ProductCategory.IDValue) {
         self.id = id
         self.name = name
         self.price = price
         self.description = description
+        self.$category.id = categoryID
     }
 }
