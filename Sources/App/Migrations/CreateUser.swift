@@ -8,19 +8,20 @@
 import Fluent
 
 struct CreateUser: AsyncMigration {
-    typealias FieldKeys = User.CodingKeys
+    typealias Key = User.Key
     
     func prepare(on database: FluentKit.Database) async throws {
         try await database.schema(User.schema)
             .id()
-            .field(FieldKeys.login.fieldKey, .string, .required)
-            .field(FieldKeys.name.fieldKey, .string, .required)
-            .field(FieldKeys.lastname.fieldKey, .string, .required)
-            .field(FieldKeys.password.fieldKey, .string, .required)
-            .field(FieldKeys.email.fieldKey, .string, .required)
-            .field(FieldKeys.gender.fieldKey, .string, .required)
-            .field(FieldKeys.creditCard.fieldKey, .string, .required)
-            .field(FieldKeys.bio.fieldKey, .string, .required)
+            .field(Key.login.fieldKey, .string, .required)
+            .unique(on: Key.login.fieldKey)
+            .field(Key.name.fieldKey, .string, .required)
+            .field(Key.lastname.fieldKey, .string, .required)
+            .field(Key.password.fieldKey, .string, .required)
+            .field(Key.email.fieldKey, .string, .required)
+            .field(Key.gender.fieldKey, .string, .required)
+            .field(Key.creditCard.fieldKey, .string, .required)
+            .field(Key.bio.fieldKey, .string, .required)
             .create()
     }
     
