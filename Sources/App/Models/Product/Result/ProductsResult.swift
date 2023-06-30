@@ -27,9 +27,15 @@ struct ProductsResult: Content {
         let id: UUID?
         let name: String
         let price: Float
+        let categoryID: UUID?
+        let description: String
         
         static func fubric(_ product: Product) -> ProductResult {
-            return ProductResult(id: product.id, name: product.name, price: product.price)
+            return ProductResult(id: product.id,
+                                 name: product.name,
+                                 price: product.price,
+                                 categoryID: product.$category.id,
+                                 description: product.description)
         }
     }
 }
