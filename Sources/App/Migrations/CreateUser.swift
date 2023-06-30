@@ -14,7 +14,6 @@ struct CreateUser: AsyncMigration {
         try await database.schema(User.schema)
             .id()
             .field(Key.login.fieldKey, .string, .required)
-            .unique(on: Key.login.fieldKey)
             .field(Key.name.fieldKey, .string, .required)
             .field(Key.lastname.fieldKey, .string, .required)
             .field(Key.password.fieldKey, .string, .required)
@@ -22,6 +21,8 @@ struct CreateUser: AsyncMigration {
             .field(Key.gender.fieldKey, .string, .required)
             .field(Key.creditCard.fieldKey, .string, .required)
             .field(Key.bio.fieldKey, .string, .required)
+            .unique(on: Key.login.fieldKey)
+            .unique(on: Key.email.fieldKey)
             .create()
     }
     
