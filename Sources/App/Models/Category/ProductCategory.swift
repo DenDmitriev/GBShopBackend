@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  ProductCategory.swift
 //  
 //
 //  Created by Denis Dmitriev on 29.06.2023.

@@ -17,7 +17,7 @@ final class Product: Model, Content, Codable {
     @Field(key: "price") var price: Float
     @Field(key: "description") var description: String
     
-    @Parent(key: Key.category.fieldKey) var category: ProductCategory
+    @OptionalParent(key: Key.category.fieldKey) var category: ProductCategory?
     
     enum Key: String {
         case id
@@ -37,7 +37,7 @@ final class Product: Model, Content, Codable {
          name: String,
          price: Float,
          description: String,
-         categoryID: ProductCategory.IDValue) {
+         categoryID: UUID? = nil) {
         self.id = id
         self.name = name
         self.price = price

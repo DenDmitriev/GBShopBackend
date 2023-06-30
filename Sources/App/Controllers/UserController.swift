@@ -46,7 +46,7 @@ struct UserController: RouteCollection {
         return user
     }
     
-    /// Dekete user func by id
+    /// Delete user func by id
     ///
     /// Path method delete http://api/users/<user_id>
     /// - Returns: HTTPStatus
@@ -82,7 +82,7 @@ struct UserController: RouteCollection {
             .first() {
             return .init(result: .zero, errorMessage: "Пользователь с логином \(user.login) уже существует. Выберите другой.")
         }
-        try await user.save(on: req.db)
+        try await user.create(on: req.db)
         return RegisterUserResult(result: 1, userMessage: "Регистрация \(user.name) прошла успешно!")
     }
     
