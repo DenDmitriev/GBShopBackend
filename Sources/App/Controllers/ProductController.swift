@@ -36,7 +36,7 @@ struct ProductController: RouteCollection {
             return .init(result: 0, errorMessage: "Количество товаров меньше чем страниц.")
         }
         let productsOnPage = sliceProducts(products: products, page: page, perPage: perPage)
-            .map { ProductsResult.ProductResult.fubric($0) }
+//            .map { ProductsResult.ProductResult.fubric($0) }
         return .init(result: 1, page: page, products: productsOnPage)
     }
     
@@ -68,7 +68,7 @@ struct ProductController: RouteCollection {
         }
         
         let productsOnPage = sliceProducts(products: products, page: page, perPage: perPage)
-            .map { ProductsResult.ProductResult.fubric($0) }
+//            .map { ProductsResult.ProductResult.fubric($0) }
         
         return .init(result: 1, page: page, products: productsOnPage)
     }
