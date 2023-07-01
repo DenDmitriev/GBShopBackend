@@ -10,12 +10,12 @@ import Vapor
 struct ProductsResult: Content {
     let result: Int
     let page: Int?
-    let products: [ProductResult]?
+    let products: [Product]?
     let errorMessage: String?
     
     init(result: Int,
          page: Int? = nil,
-         products: [ProductResult]? = nil,
+         products: [Product]? = nil,
          errorMessage: String? = nil) {
         self.result = result
         self.page = page
@@ -23,19 +23,19 @@ struct ProductsResult: Content {
         self.errorMessage = errorMessage
     }
     
-    struct ProductResult: Codable {
-        let id: UUID?
-        let name: String
-        let price: Float
-        let category: UUID?
-        let description: String
-        
-        static func fubric(_ product: Product) -> ProductResult {
-            return ProductResult(id: product.id,
-                                 name: product.name,
-                                 price: product.price,
-                                 category: product.$category.id,
-                                 description: product.description)
-        }
-    }
+//    struct ProductResult: Codable {
+//        let id: UUID?
+//        let name: String
+//        let price: Float
+//        let category: ProductCategory?
+//        let description: String
+//
+//        static func fubric(_ product: Product) -> ProductResult {
+//            return ProductResult(id: product.id,
+//                                 name: product.name,
+//                                 price: product.price,
+//                                 category: product.$category,
+//                                 description: product.description)
+//        }
+//    }
 }
