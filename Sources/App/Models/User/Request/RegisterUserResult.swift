@@ -9,11 +9,16 @@ import Vapor
 
 struct RegisterUserResult: Content {
     let result: Int
+    let userID: String?
     let userMessage: String?
     let errorMessage: String?
     
-    init(result: Int, userMessage: String? = nil, errorMessage: String? = nil) {
+    init(result: Int,
+         userID: String? = nil,
+         userMessage: String? = nil,
+         errorMessage: String? = nil) {
         self.result = result
+        self.userID = userID
         self.userMessage = userMessage
         self.errorMessage = errorMessage
     }
