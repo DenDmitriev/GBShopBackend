@@ -13,15 +13,10 @@ struct CreateUser: AsyncMigration {
     func prepare(on database: FluentKit.Database) async throws {
         try await database.schema(User.schema)
             .id()
-            .field(Key.login.fieldKey, .string, .required)
             .field(Key.name.fieldKey, .string, .required)
-            .field(Key.lastname.fieldKey, .string, .required)
-            .field(Key.password.fieldKey, .string, .required)
+            .field(Key.passwordHash.fieldKey, .string, .required)
             .field(Key.email.fieldKey, .string, .required)
-            .field(Key.gender.fieldKey, .string, .required)
             .field(Key.creditCard.fieldKey, .string, .required)
-            .field(Key.bio.fieldKey, .string, .required)
-            .unique(on: Key.login.fieldKey)
             .unique(on: Key.email.fieldKey)
             .create()
     }

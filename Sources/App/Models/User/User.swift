@@ -13,25 +13,17 @@ final class User: Model, Content, Codable {
     
     @ID(key: .id) var id: UUID?
     
-    @Field(key: Key.login.fieldKey) var login: String
     @Field(key: Key.name.fieldKey) var name: String
-    @Field(key: Key.lastname.fieldKey) var lastname: String
-    @Field(key: Key.password.fieldKey) var password: String
+    @Field(key: Key.passwordHash.fieldKey) var passwordHash: String
     @Field(key: Key.email.fieldKey) var email: String
-    @Field(key: Key.gender.fieldKey) var gender: String
     @Field(key: Key.creditCard.fieldKey) var creditCard: String
-    @Field(key: Key.bio.fieldKey) var bio: String
     
     enum Key: String {
         case id = "id"
-        case login = "login"
         case name = "name"
-        case lastname = "lastname"
-        case password = "password"
+        case passwordHash = "password_hash"
         case email = "email"
-        case gender = "gender"
         case creditCard = "credit_card"
-        case bio = "bio"
         
         var fieldKey: FieldKey {
             return FieldKey(stringLiteral: self.rawValue)
@@ -41,22 +33,57 @@ final class User: Model, Content, Codable {
     init() { }
     
     init(id: UUID? = nil,
-         login: String,
          name: String,
-         lastname: String,
-         password: String,
+         passwordHash: String,
          email: String,
-         gender: String,
-         creditCard: String,
-         bio: String) {
+         creditCard: String) {
         self.id = id
-        self.login = login
         self.name = name
-        self.lastname = lastname
-        self.password = password
+        self.passwordHash = passwordHash
         self.email = email
-        self.gender = gender
         self.creditCard = creditCard
-        self.bio = bio
+    }
+}
+
+extension User {
+    struct Create: Content {
+        var name: String
+        var email: String
+        var password: String
+        var confirmPassword: String
+        var creditCard: String
+    }
+    
+    struct Update: Content {
+        var id: UUID
+        var name: String
+        var email: String
+        var creditCard: String
+    }
+}
+
+extension User.Create: Validatable {
+    static func validations(_ validations: inout Validations) {
+        validations.add("name", as: String.self, is: !.empty)
+        validations.add("email", as: String.self, is: .email)
+        validations.add("password", as: String.self, is: .count(8...))
+        validations.add("creditCard", as: String.self, is: .count(14...16) && .alphanumeric)
+    }
+}
+
+extension User.Update: Validatable {
+    static func validations(_ validations: inout Validations) {
+        validations.add("name", as: String.self, is: !.empty)
+        validations.add("email", as: String.self, is: .email)
+        validations.add("creditCard", as: String.self, is: .count(14...16) && .alphanumeric)
+    }
+}
+
+extension User: ModelAuthenticatable {
+    static let usernameKey = \User.$email
+    static let passwordHashKey = \User.$passwordHash
+    
+    func verify(password: String) throws -> Bool {
+        try Bcrypt.verify(password, created: self.passwordHash)
     }
 }
