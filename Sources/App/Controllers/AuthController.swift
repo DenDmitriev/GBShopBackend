@@ -17,7 +17,7 @@ struct AuthController: RouteCollection {
     
     /// Authorization in customer service user func
     ///
-    /// Authorization: Basic post method post http://api/users/authorization
+    /// Authorization: Basic post method post http://api/login
     ///
     /// - Parameter username: String email of user
     /// - Parameter password: String password of user

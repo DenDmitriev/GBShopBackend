@@ -11,7 +11,6 @@ import Vapor
 struct UserController: RouteCollection {
     func boot(routes: Vapor.RoutesBuilder) throws {
         let users = routes.grouped("users")
-        users.get("all", use: index)
         users.post("register", use: register)
         users.post("update", use: update)
         
@@ -20,14 +19,6 @@ struct UserController: RouteCollection {
             user.put(use: update)
             user.delete(use: delete)
         }
-    }
-    
-    /// All users get func
-    ///
-    /// Path method post http://api/users/all
-    /// - Returns: All users in Array Users models
-    func index(req: Request) async throws -> [User] {
-        try await User.query(on: req.db).all()
     }
     
     /// Get user func by id
