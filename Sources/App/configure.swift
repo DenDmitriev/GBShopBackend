@@ -19,10 +19,6 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateProduct())
     app.migrations.add(CreateProductCategory())
     
-    let todosMigration = CreateTodo()
-    try await todosMigration.revert(on: app.db)
-    let userMigration = CreateTodo()
-    try await todosMigration.revert(on: app.db)
     try await app.autoMigrate()
 
     // register routes
