@@ -13,14 +13,14 @@ struct CreateProduct: AsyncMigration {
     func prepare(on database: Database) async throws {
         try await database.schema(Product.schema)
             .id()
-            .field(Key.category.fieldKey, .uuid, .references("category", "id"))
+            .field(Key.category.fieldKey, .uuid)
             .field(Key.name.fieldKey, .string, .required)
             .field(Key.price.fieldKey, .float, .required)
             .field(Key.description.fieldKey, .string, .required)
             .create()
     }
     
-    func revert(on database: FluentKit.Database) async throws {
+    func revert(on database: Database) async throws {
         try await database.schema(Product.schema).delete()
     }
 }
