@@ -105,7 +105,9 @@ struct ProductController: RouteCollection {
     func add(req: Request) async throws -> AddProductResult {
         let productRequest = try req.content.decode(AddProductRequest.self)
         let categoryID = productRequest.categoryID
-        guard ((try await ProductCategory.find(categoryID, on: req.db)) != nil) else {
+        guard
+            let category = try await ProductCategory.find(categoryID, on: req.db)
+        else {
             return .init(result: 0, errorMessage: "Такой категории товаров не существует.")
         }
         guard ((try await Product.find(productRequest.id, on: req.db)) == nil) else {
@@ -115,7 +117,7 @@ struct ProductController: RouteCollection {
                               name: productRequest.name,
                               price: productRequest.price,
                               description: productRequest.description,
-                              categoryID: categoryID)
+                              categoryID: category.id)
         try await product.create(on: req.db)
         return .init(result: 1)
     }
