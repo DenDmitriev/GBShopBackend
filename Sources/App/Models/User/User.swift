@@ -46,6 +46,36 @@ final class User: Model, Content, Codable {
 }
 
 extension User {
+    struct Public: Content {
+        var id: UUID?
+        var name: String
+        var email: String
+        var creditCard: String
+        
+        init(from user: User) {
+            self.id = user.id
+            self.name = user.name
+            self.email = user.email
+            self.creditCard = user.creditCard
+        }
+    }
+    
+    struct Login: Content {
+        var id: UUID?
+        var name: String
+        var email: String
+        var creditCard: String
+        var token: String
+        
+        init(from user: User, with token: String) {
+            self.id = user.id
+            self.name = user.name
+            self.email = user.email
+            self.creditCard = user.creditCard
+            self.token = token
+        }
+    }
+    
     struct Create: Content {
         var name: String
         var email: String
@@ -85,5 +115,18 @@ extension User: ModelAuthenticatable {
     
     func verify(password: String) throws -> Bool {
         try Bcrypt.verify(password, created: self.passwordHash)
+    }
+}
+
+extension User {
+    func generateToken() throws -> UserToken {
+        let calendar = Calendar(identifier: .gregorian)
+        let expiryDate = calendar.date(byAdding: .day, value: 1, to: Date())
+        
+        return try .init(
+            value: [UInt8].random(count: 16).base64,
+            userID: self.requireID(),
+            expiresAt: expiryDate
+        )
     }
 }

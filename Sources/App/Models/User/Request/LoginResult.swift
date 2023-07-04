@@ -9,10 +9,10 @@ import Vapor
 
 struct LoginResult: Content {
     let result: Int
-    let user: User?
+    let user: User.Login?
     let errorMessage: String?
     
-    init(result: Int, user: User? = nil, errorMessage: String? = nil) {
+    init(result: Int, user: User.Login? = nil, errorMessage: String? = nil) {
         self.result = result
         self.user = user
         self.errorMessage = errorMessage
