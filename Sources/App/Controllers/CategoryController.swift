@@ -19,22 +19,26 @@ struct CategoryController: RouteCollection {
         }
     }
     
-    /// Categories
-    ///
-    /// Path method get http://api/categories/all
-    /// - Returns: All Categories array
+    /**
+     Categories
+     
+     Path method get http://api/categories/all
+     - Returns: All Categories array
+     */
     func all(req: Request) async throws -> [ProductCategory] {
         try await ProductCategory.query(on: req.db).all() // .with(\.$products)
     }
     
-    /// Add new category method
-    ///
-    /// Path method post http://api/categories/add
-    /// - Parameter id: UUID of product
-    /// - Parameter name: Name of product
-    /// - Parameter description: Description of product
-    /// - Parameter products: Leave blank
-    /// - Returns: AddCategoryResult with value result: Int, category: ProductCategory.
+    /**
+     Add new category method
+     
+     Path method post http://api/categories/add
+     - Parameter id: UUID of product
+     - Parameter name: Name of product
+     - Parameter description: Description of product
+     - Parameter products: Leave blank
+     - Returns: AddCategoryResult with value result: Int, category: ProductCategory.
+     */
     func add(req: Request) async throws -> AddCategoryResult {
         let category = try req.content.decode(ProductCategory.self)
         guard ((try await ProductCategory.find(category.id, on: req.db)) == nil) else {
@@ -50,11 +54,13 @@ struct CategoryController: RouteCollection {
         return .init(result: 1, category: category)
     }
     
-    /// Category by id
-    ///
-    /// Path method get http://api/categories/<category_id>
-    /// - Parameter id: UUID of category
-    /// - Returns: ProductResult model with value result: Int, product: Product.
+    /**
+     Category by id
+     
+     Path method get http://api/categories/<category_id>
+     - Parameter id: UUID of category
+     - Returns: ProductResult model with value result: Int, product: Product.
+     */
     func category(req: Request) async throws -> CategoryResult {
         guard
             let request = req.parameters.get("id"),
@@ -70,10 +76,12 @@ struct CategoryController: RouteCollection {
         return .init(result: 1, category: category)
     }
     
-    /// Delete category by id
-    ///
-    /// Path method delete http://api/products/<category_id>
-    /// - Returns: HTTPStatus
+    /**
+     Delete category by id
+     
+     Path method delete http://api/products/<category_id>
+     - Returns: HTTPStatus
+     */
     func delete(req: Request) async throws -> HTTPStatus {
         guard let category = try await ProductCategory.find(req.parameters.get("id"), on: req.db) else {
             throw Abort(.notFound)
