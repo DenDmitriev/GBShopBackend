@@ -18,6 +18,8 @@ final class User: Model, Content, Codable {
     @Field(key: Key.email.fieldKey) var email: String
     @Field(key: Key.creditCard.fieldKey) var creditCard: String
     
+    @Children(for: \.$user) var reviews: [Review]
+    
     enum Key: String {
         case id = "id"
         case name = "name"

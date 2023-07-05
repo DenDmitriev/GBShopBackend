@@ -18,6 +18,7 @@ final class Product: Model, Content, Codable {
     @Field(key: "description") var description: String
     
     @OptionalParent(key: Key.category.fieldKey) var category: ProductCategory?
+    @Children(for: \.$product) var reviews: [Review]
     
     enum Key: String {
         case id
