@@ -46,3 +46,21 @@ final class Product: Model, Content, Codable {
         self.$category.id = categoryID
     }
 }
+
+extension Product {
+    struct Public: Content {
+        let id: UUID?
+        let name: String
+        let price: Float
+        let description: String
+        let categoryID: UUID?
+        
+        static func makePublicProduct(_ product: Product) -> Public {
+            return Public(id: product.id,
+                          name: product.name,
+                          price: product.price,
+                          description: product.description,
+                          categoryID: product.id)
+        }
+    }
+}

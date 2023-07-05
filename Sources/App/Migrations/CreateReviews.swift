@@ -17,6 +17,7 @@ struct CreateReviews: AsyncMigration {
             .field(Key.product.fieldKey, .uuid, .required)
             .field(Key.value.fieldKey, .string, .required)
             .field(Key.rating.fieldKey, .int8, .required)
+            .field(Key.createdAt.fieldKey, .date)
             .create()
     }
     

@@ -18,6 +18,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(UserToken.Migration())
     app.migrations.add(CreateProduct())
     app.migrations.add(CreateProductCategory())
+    app.migrations.add(CreateReviews())
     
     try await app.autoMigrate()
 

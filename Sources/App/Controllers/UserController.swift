@@ -25,7 +25,7 @@ struct UserController: RouteCollection {
      Get user func by id
      
      Path method get http://api/users/<user_id>
-     - Returns: User model
+     - Returns: `User` model
      */
     func user(req: Request) async throws -> User {
         guard let id = req.parameters.get("id") else {
@@ -60,7 +60,7 @@ struct UserController: RouteCollection {
      - Parameter confirmPassword: String confirmPassword of user
      - Parameter email: String email of user
      - Parameter creditCard: String number credit card of user
-     - Returns: RegisterUserResult model with value result: Int, userMessage: String
+     - Returns: `RegisterUserResult` model with value result: Int, userMessage: String
      */
     func register(req: Request) async throws -> RegisterUserResult {
         do {
@@ -107,7 +107,7 @@ struct UserController: RouteCollection {
      - Parameter password: String password of user
      - Parameter confirmPassword: String confirmPassword of user
      - Parameter creditCard: String number credit card of user
-     - Returns: ChangeUserDataResult model with value result: Int
+     - Returns: `ChangeUserDataResult` model with value result: Int
      */
     func update(req: Request) async throws -> ChangeUserDataResult {
         do {

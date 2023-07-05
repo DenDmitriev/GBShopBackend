@@ -10,7 +10,6 @@ import Vapor
 
 final class ProductCategory: Model, Content, Codable {
     static let schema = "products_category"
-    static let productPerPage: Int = 10
     
     @ID(key: .id) var id: UUID?
     

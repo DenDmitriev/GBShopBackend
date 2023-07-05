@@ -11,7 +11,6 @@ import Vapor
 struct ProductController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let products = routes.grouped("products")
-        products.get("all", use: all)
         products.get("category", use: category)
         products.post("add", use: add)
         products.post("update", use: update)
@@ -22,59 +21,37 @@ struct ProductController: RouteCollection {
     }
     
     /**
-     Products by page
-     
-     Path method get http://api/products/all
-     - Parameter page: Int page number
-     - Returns: ProductsResult model with value result: Int, page: Int, products: [Product]
-     */
-    func all(req: Request) async throws -> ProductsResult {
-        let productsRequest = try req.query.decode(ProductsRequest.self)
-        let page = productsRequest.page
-        let products = try await Product.query(on: req.db).all()
-        let perPage = ProductCategory.productPerPage
-        
-        guard products.count >= page * perPage else {
-            return .init(result: 0, errorMessage: "Количество товаров меньше чем страниц.")
-        }
-        let productsOnPage = sliceProducts(products: products, page: page, perPage: perPage)
-        //            .map { ProductsResult.ProductResult.fubric($0) }
-        return .init(result: 1, page: page, products: productsOnPage)
-    }
-    
-    /**
      Products by page from category
      
      Path method get http://api/products/category
-     - Parameter page: Int page number
+     - Parameter page: Int page numbers start at 1
+     - Parameter per: Int element per page
      - Parameter category: UUID of category
      - Returns: ProductsResult model with value result: Int, page: Int, products: [Product]
      */
     func category(req: Request) async throws -> ProductsResult {
         let productsRequest = try req.query.decode(ProductsByCategoryRequest.self)
-        let page = productsRequest.page
+
         let categoryID = productsRequest.category
         
         guard let category = try await ProductCategory.find(categoryID, on: req.db) else {
             return .init(result: 0, errorMessage: "Такой категории товаров не существует.")
         }
         
-        let products = try await category.$products.get(on: req.db)
+        let per = productsRequest.per
+        let page = productsRequest.page
+        let products = try await category.$products
+            .query(on: req.db)
+            .page(withIndex: page, size: per)
         
-        guard !products.isEmpty else {
-            return .init(result: 0, errorMessage: "Не удалось найти товары в категории \(category.name)")
-        }
+        let publicProducts = products
+            .map { Product.Public.makePublicProduct($0) }
+            .items
         
-        let perPage = ProductCategory.productPerPage
+        let total = try await category.$products.get(on: req.db).count
+        let metadata = Metadata(page: page, per: per, total: total)
         
-        guard products.count >= page * perPage else {
-            return .init(result: 0, errorMessage: "Количество товаров меньше чем страниц.")
-        }
-        
-        let productsOnPage = sliceProducts(products: products, page: page, perPage: perPage)
-        //            .map { ProductsResult.ProductResult.fubric($0) }
-        
-        return .init(result: 1, page: page, products: productsOnPage)
+        return .init(result: 1, page: page, products: publicProducts, metadata: metadata)
     }
     
     /**
@@ -166,22 +143,5 @@ struct ProductController: RouteCollection {
         }
         try await product.delete(on: req.db)
         return .noContent
-    }
-    
-    // MARK: - Private functions
-    
-    private func sliceProducts(products: [Product], page: Int, perPage: Int) -> [Product] {
-        guard products.count >= page * perPage else {
-            return []
-        }
-        
-        let startIndex = page * perPage
-        var endIndex = startIndex + perPage
-        if endIndex > products.count {
-            endIndex = products.count
-        }
-        let slice = products[startIndex..<endIndex]
-        let productsOnPage = Array(slice)
-        return productsOnPage
     }
 }

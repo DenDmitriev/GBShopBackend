@@ -9,5 +9,6 @@ import Vapor
 
 struct ProductsByCategoryRequest: Content {
     let page: Int
+    let per: Int
     let category: UUID?
 }

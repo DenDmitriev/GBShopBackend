@@ -10,7 +10,6 @@ import Vapor
 
 final class Review: Model, Content {
     static let schema = "reviews"
-    static let reviewsPerPage: Int = 10
     
     @ID(key: .id) var id: UUID?
     
@@ -25,7 +24,7 @@ final class Review: Model, Content {
         case user = "user_id"
         case value
         case product
-        case createdAt
+        case createdAt = "created_at"
         case rating
         
         var fieldKey: FieldKey {
@@ -35,9 +34,10 @@ final class Review: Model, Content {
     
     init() {}
     
-    init(id: UUID? = nil, value: String, userID: User.IDValue, productID: Product.IDValue) {
+    init(id: UUID? = nil, value: String, userID: User.IDValue, productID: Product.IDValue, rating: Int) {
         self.id = id
         self.value = value
+        self.rating = rating
         self.$user.id = userID
         self.$product.id = productID
     }
@@ -46,12 +46,21 @@ final class Review: Model, Content {
 
 extension Review {
     struct Public: Content {
-        let id: UUID
+        let id: UUID?
         let reviewer: String
         let review: String
         let rating: Int
-        let productID: UUID
-        let createdAt: Date
+        let productID: UUID?
+        let createdAt: Date?
+        
+        static func makePublicReviews(review: Review) -> Public {
+            return .init(id: review.id,
+                         reviewer: review.$user.name,
+                         review: review.value,
+                         rating: review.rating,
+                         productID: review.$product.id,
+                         createdAt: review.createdAt)
+        }
     }
 }
 
