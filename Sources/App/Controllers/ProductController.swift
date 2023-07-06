@@ -88,20 +88,23 @@ struct ProductController: RouteCollection {
      - Returns: AddProductResult with value result: Int.
      */
     func add(req: Request) async throws -> AddProductResult {
-        let productRequest = try req.content.decode(AddProductRequest.self)
-        let categoryID = productRequest.categoryID
-        guard
-            let category = try await ProductCategory.find(categoryID, on: req.db)
+        let addProduct = try req.content.decode(Product.AddProduct.self)
+        
+        let categoryID = addProduct.categoryID
+        guard let category = try await ProductCategory.find(categoryID, on: req.db)
         else {
             return .init(result: 0, errorMessage: "Такой категории товаров не существует.")
         }
-        guard ((try await Product.find(productRequest.id, on: req.db)) == nil) else {
+        
+        guard try await Product.query(on: req.db)
+            .filter(\.$name == addProduct.name)
+            .first() == nil
+        else {
             return .init(result: 0, errorMessage: "Такой товар уже существует.")
         }
-        let product = Product(id: productRequest.id,
-                              name: productRequest.name,
-                              price: productRequest.price,
-                              description: productRequest.description,
+        let product = Product(name: addProduct.name,
+                              price: addProduct.price,
+                              description: addProduct.description,
                               categoryID: category.id)
         try await product.create(on: req.db)
         return .init(result: 1)
@@ -119,8 +122,9 @@ struct ProductController: RouteCollection {
      - Returns: AddProductResult with value result: Int.
      */
     func update(req: Request) async throws -> UpdateProductResult {
-        let productRequest = try req.content.decode(AddProductRequest.self)
-        guard let product = try await Product.find(productRequest.id, on: req.db) else {
+        let productRequest = try req.content.decode(Product.UpdateProduct.self)
+        guard let product = try await Product.find(productRequest.id, on: req.db)
+        else {
             return .init(result: 0, errorMessage: "Такого продукта не существует.")
         }
         product.name = productRequest.name

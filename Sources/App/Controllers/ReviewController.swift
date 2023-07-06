@@ -31,12 +31,12 @@ struct ReviewController: RouteCollection {
      - Returns: `AddReviewResult` model
      */
     func addReview(req: Request) async throws -> AddReviewResult {
-        let addReviewRequest = try req.content.decode(AddReviewRequest.self)
+        let addReview = try req.content.decode(Review.AddReview.self)
         
-        let review = Review(value: addReviewRequest.review,
-                            userID: addReviewRequest.userID,
-                            productID: addReviewRequest.productID,
-                            rating: addReviewRequest.rating)
+        let review = Review(value: addReview.review,
+                            userID: addReview.userID,
+                            productID: addReview.productID,
+                            rating: addReview.rating)
         try await review.create(on: req.db)
         
         return .init(result: 1)

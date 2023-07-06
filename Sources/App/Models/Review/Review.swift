@@ -23,7 +23,7 @@ final class Review: Model, Content {
     enum Key: String {
         case user = "user_id"
         case value
-        case product
+        case product = "product_id"
         case createdAt = "created_at"
         case rating
         
@@ -61,6 +61,13 @@ extension Review {
                          productID: review.$product.id,
                          createdAt: review.createdAt)
         }
+    }
+    
+    struct AddReview: Content {
+        let userID: UUID
+        let review: String
+        let productID: UUID
+        let rating: Int
     }
 }
 

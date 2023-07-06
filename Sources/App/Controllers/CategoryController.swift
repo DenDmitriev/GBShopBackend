@@ -33,23 +33,21 @@ struct CategoryController: RouteCollection {
      Add new category method
      
      Path method post http://api/categories/add
-     - Parameter id: UUID of product
      - Parameter name: Name of product
      - Parameter description: Description of product
      - Parameter products: Leave blank
      - Returns: AddCategoryResult with value result: Int, category: ProductCategory.
      */
     func add(req: Request) async throws -> AddCategoryResult {
-        let category = try req.content.decode(ProductCategory.self)
-        guard ((try await ProductCategory.find(category.id, on: req.db)) == nil) else {
-            return .init(result: 0, errorMessage: "Категория уже существует")
-        }
+        let addProductCategory = try req.content.decode(ProductCategory.AddProductCategory.self)
         guard ((try await ProductCategory.query(on: req.db)
-            .filter(\.$name == category.name)
+            .filter(\.$name == addProductCategory.name)
             .first()) == nil)
         else {
-            return .init(result: 0, errorMessage: "Категория c названием \(category.name) уже существует")
+            return .init(result: 0, errorMessage: "Категория c названием \(addProductCategory.name) уже существует")
         }
+        let category = ProductCategory(name: addProductCategory.name,
+                                       description: addProductCategory.description)
         try await category.create(on: req.db)
         return .init(result: 1, category: category)
     }

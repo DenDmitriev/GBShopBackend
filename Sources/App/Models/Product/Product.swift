@@ -63,4 +63,19 @@ extension Product {
                           categoryID: product.id)
         }
     }
+    
+    struct AddProduct: Content {
+        let name: String
+        let price: Float
+        let description: String
+        let categoryID: UUID?
+    }
+    
+    struct UpdateProduct: Content {
+        let id: UUID
+        let name: String
+        let price: Float
+        let description: String
+        let categoryID: UUID
+    }
 }

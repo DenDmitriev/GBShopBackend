@@ -26,4 +26,21 @@ final class ProductCategory: Model, Content, Codable {
             return FieldKey(stringLiteral: self.rawValue)
         }
     }
+    
+    init() { }
+    
+    init(id: UUID? = nil,
+         name: String,
+         description: String) {
+        self.id = id
+        self.name = name
+        self.description = description
+    }
+}
+
+extension ProductCategory {
+    struct AddProductCategory: Content {
+        let name: String
+        let description: String
+    }
 }

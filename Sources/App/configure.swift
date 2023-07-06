@@ -21,6 +21,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateReviews())
     
     try await app.autoMigrate()
+//    try await app.autoRevert()
 
     // register routes
     try routes(app)

@@ -15,6 +15,7 @@ struct CreateProductCategory: AsyncMigration {
             .id()
             .field(Key.name.fieldKey, .string, .required)
             .field(Key.description.fieldKey, .string, .required)
+            .unique(on: Key.name.fieldKey)
             .create()
     }
     
