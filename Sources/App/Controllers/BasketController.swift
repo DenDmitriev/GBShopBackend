@@ -32,7 +32,7 @@ struct BasketController: RouteCollection {
         else {
             return .init(result: 0, errorMessage: "Пользователь не найден.")
         }
-        var productIDs = [Product.IDValue](repeating: addToBasketRequest.productID,
+        let productIDs = [Product.IDValue](repeating: addToBasketRequest.productID,
                                            count: addToBasketRequest.count)
         
         if user.$basket.value == nil {
@@ -60,7 +60,7 @@ struct BasketController: RouteCollection {
         else {
             return .init(result: 0, errorMessage: "Пользователь не найден.")
         }
-        var productIDs = [Product.IDValue](repeating: deleteFromBasketRequest.productID,
+        let productIDs = [Product.IDValue](repeating: deleteFromBasketRequest.productID,
                                            count: deleteFromBasketRequest.count)
         
         try await updateBasket(with: productIDs, for: user, with: .delete, on: req.db)
