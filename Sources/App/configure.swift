@@ -17,9 +17,12 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateUser())
     app.migrations.add(UserToken.Migration())
     app.migrations.add(CreateProduct())
-    app.migrations.add(CreateProductCategory())
+    app.migrations.add(CreateReviews())
+    app.migrations.add(CreateCategory())
+    app.migrations.add(CreateBasket())
     
-    try await app.autoMigrate()
+    try await app.autoRevert()
+//    try await app.autoMigrate()
 
     // register routes
     try routes(app)

@@ -37,7 +37,7 @@ extension UserToken {
             try await database.schema("user_tokens")
                 .id()
                 .field("value", .string, .required)
-                .field("user_id", .uuid, .required, .references("users", "id"))
+                .field("user_id", .uuid, .required, .references(User.schema, "id"))
                 .field("expires_at", .date, .required)
                 .unique(on: "value")
                 .create()

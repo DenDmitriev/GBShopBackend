@@ -1,27 +1,27 @@
 //
-//  ProductsResult.swift
+//  GetReviewsResult.swift
 //  
 //
-//  Created by Denis Dmitriev on 29.06.2023.
+//  Created by Denis Dmitriev on 05.07.2023.
 //
 
 import Vapor
 
-struct ProductsResult: Content {
+struct GetReviewsResult: Content {
     let result: Int
     let page: Int?
-    let products: [Product.Public]?
+    let reviews: [Review.Public]?
     let errorMessage: String?
     let metadata: Metadata?
     
     init(result: Int,
          page: Int? = nil,
-         products: [Product.Public]? = nil,
+         reviews: [Review.Public]? = nil,
          errorMessage: String? = nil,
          metadata: Metadata? = nil) {
         self.result = result
         self.page = page
-        self.products = products
+        self.reviews = reviews
         self.errorMessage = errorMessage
         self.metadata = metadata
     }

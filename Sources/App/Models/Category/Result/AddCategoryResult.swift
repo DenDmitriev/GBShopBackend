@@ -9,11 +9,11 @@ import Vapor
 
 struct AddCategoryResult: Content {
     let result: Int
-    let category: ProductCategory?
+    let category: Category?
     let errorMessage: String?
     
     init(result: Int,
-         category: ProductCategory? = nil,
+         category: Category? = nil,
          errorMessage: String? = nil) {
         self.result = result
         self.category = category

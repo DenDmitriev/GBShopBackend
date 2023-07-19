@@ -11,7 +11,6 @@ import Vapor
 struct ProductController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let products = routes.grouped("products")
-        products.get("all", use: all)
         products.get("category", use: category)
         products.post("add", use: add)
         products.post("update", use: update)
@@ -21,63 +20,47 @@ struct ProductController: RouteCollection {
         }
     }
     
-    /// Products by page
-    ///
-    /// Path method get http://api/products/all
-    /// - Parameter page: Int page number
-    /// - Returns: ProductsResult model with value result: Int, page: Int, products: [Product]
-    func all(req: Request) async throws -> ProductsResult {
-        let productsRequest = try req.query.decode(ProductsRequest.self)
-        let page = productsRequest.page
-        let products = try await Product.query(on: req.db).all()
-        let perPage = ProductCategory.productPerPage
-        
-        guard products.count >= page * perPage else {
-            return .init(result: 0, errorMessage: "Количество товаров меньше чем страниц.")
-        }
-        let productsOnPage = sliceProducts(products: products, page: page, perPage: perPage)
-//            .map { ProductsResult.ProductResult.fubric($0) }
-        return .init(result: 1, page: page, products: productsOnPage)
-    }
-    
-    /// Products by page from category
-    ///
-    /// Path method get http://api/products/category
-    /// - Parameter page: Int page number
-    /// - Parameter category: UUID of category
-    /// - Returns: ProductsResult model with value result: Int, page: Int, products: [Product]
+    /**
+     Products by page from category
+     
+     Path method get http://api/products/category
+     - Parameter page: Int page numbers start at 1
+     - Parameter per: Int element per page
+     - Parameter category: UUID of category
+     - Returns: ProductsResult model with value result: Int, page: Int, products: [Product]
+     */
     func category(req: Request) async throws -> ProductsResult {
         let productsRequest = try req.query.decode(ProductsByCategoryRequest.self)
-        let page = productsRequest.page
+
         let categoryID = productsRequest.category
         
-        guard let category = try await ProductCategory.find(categoryID, on: req.db) else {
+        guard let category = try await Category.find(categoryID, on: req.db) else {
             return .init(result: 0, errorMessage: "Такой категории товаров не существует.")
         }
         
-        let products = try await category.$products.get(on: req.db)
+        let per = productsRequest.per
+        let page = productsRequest.page
+        let products = try await category.$products
+            .query(on: req.db)
+            .page(withIndex: page, size: per)
         
-        guard !products.isEmpty else {
-            return .init(result: 0, errorMessage: "Не удалось найти товары в категории \(category.name)")
-        }
+        let publicProducts = products
+            .map { Product.Public.makePublicProduct($0) }
+            .items
         
-        let perPage = ProductCategory.productPerPage
+        let total = try await category.$products.get(on: req.db).count
+        let metadata = Metadata(page: page, per: per, total: total)
         
-        guard products.count >= page * perPage else {
-            return .init(result: 0, errorMessage: "Количество товаров меньше чем страниц.")
-        }
-        
-        let productsOnPage = sliceProducts(products: products, page: page, perPage: perPage)
-//            .map { ProductsResult.ProductResult.fubric($0) }
-        
-        return .init(result: 1, page: page, products: productsOnPage)
+        return .init(result: 1, page: page, products: publicProducts, metadata: metadata)
     }
     
-    /// Product by id
-    ///
-    /// Path method get http://api/products/<product_id>
-    /// - Parameter id: UUID of product
-    /// - Returns: ProductResult model with value result: Int, product: Product.
+    /**
+     Product by id
+     
+     Path method get http://api/products/<product_id>
+     - Parameter id: UUID of product
+     - Returns: ProductResult model with value result: Int, product: Product.
+     */
     func product(req: Request) async throws -> ProductResult {
         guard
             let request = req.parameters.get("id"),
@@ -93,83 +76,81 @@ struct ProductController: RouteCollection {
         return .init(result: 1, product: product)
     }
     
-    /// Add new product method to category
-    ///
-    /// Path method post http://api/products/add
-    /// - Parameter id: UUID of product
-    /// - Parameter name: Name of product
-    /// - Parameter price: Price product
-    /// - Parameter description: Description product
-    /// - Parameter categoryID: ID category for product
-    /// - Returns: AddProductResult with value result: Int.
+    /**
+     Add new product method to category
+     
+     Path method post http://api/products/add
+     - Parameter id: UUID of product
+     - Parameter name: Name of product
+     - Parameter price: Double type price product
+     - Parameter discount: Int8 Price discount
+     - Parameter description: Description product
+     - Parameter categoryID: ID category for product
+     - Returns: AddProductResult with value result: Int.
+     */
     func add(req: Request) async throws -> AddProductResult {
-        let productRequest = try req.content.decode(AddProductRequest.self)
-        let categoryID = productRequest.categoryID
-        guard
-            let category = try await ProductCategory.find(categoryID, on: req.db)
+        let addProduct = try req.content.decode(Product.AddProduct.self)
+        
+        let categoryID = addProduct.categoryID
+        guard let category = try await Category.find(categoryID, on: req.db)
         else {
             return .init(result: 0, errorMessage: "Такой категории товаров не существует.")
         }
-        guard ((try await Product.find(productRequest.id, on: req.db)) == nil) else {
+        
+        guard try await Product.query(on: req.db)
+            .filter(\.$name == addProduct.name)
+            .first() == nil
+        else {
             return .init(result: 0, errorMessage: "Такой товар уже существует.")
         }
-        let product = Product(id: productRequest.id,
-                              name: productRequest.name,
-                              price: productRequest.price,
-                              description: productRequest.description,
+        let product = Product(name: addProduct.name,
+                              price: addProduct.price,
+                              discount: addProduct.discount,
+                              description: addProduct.description,
+                              image: addProduct.image,
                               categoryID: category.id)
         try await product.create(on: req.db)
         return .init(result: 1)
     }
     
-    /// Update product method
-    ///
-    /// Path method post http://api/products/update
-    /// - Parameter id: UUID of product
-    /// - Parameter name: Name of product
-    /// - Parameter price: Price product
-    /// - Parameter description: Description product
-    /// - Parameter categoryID: ID category for product
-    /// - Returns: AddProductResult with value result: Int.
+    /**
+     Update product method
+     
+     Path method post http://api/products/update
+     - Parameter id: UUID of product
+     - Parameter name: Name of product
+     - Parameter price: Price product
+     - Parameter discount: Int8 Price discount
+     - Parameter description: Description product
+     - Parameter categoryID: ID category for product
+     - Returns: AddProductResult with value result: Int.
+     */
     func update(req: Request) async throws -> UpdateProductResult {
-        let productRequest = try req.content.decode(AddProductRequest.self)
-        guard let product = try await Product.find(productRequest.id, on: req.db) else {
+        let productRequest = try req.content.decode(Product.UpdateProduct.self)
+        guard let product = try await Product.find(productRequest.id, on: req.db)
+        else {
             return .init(result: 0, errorMessage: "Такого продукта не существует.")
         }
         product.name = productRequest.name
         product.price = productRequest.price
+        product.discount = productRequest.discount
         product.description = productRequest.description
         product.$category.id = productRequest.categoryID
         try await product.save(on: req.db)
         return .init(result: 1)
     }
     
-    /// Delete product by id
-    ///
-    /// Path method delete http://api/products/<product_id>
-    /// - Returns: HTTPStatus
+    /**
+     Delete product by id
+     
+     Path method delete http://api/products/<product_id>
+     - Returns: HTTPStatus
+     */
     func delete(req: Request) async throws -> HTTPStatus {
         guard let product = try await Product.find(req.parameters.get("id"), on: req.db) else {
             throw Abort(.notFound)
         }
         try await product.delete(on: req.db)
         return .noContent
-    }
-    
-    // MARK: - Private functions
-    
-    private func sliceProducts(products: [Product], page: Int, perPage: Int) -> [Product] {
-        guard products.count >= page * perPage else {
-            return []
-        }
-        
-        let startIndex = page * perPage
-        var endIndex = startIndex + perPage
-        if endIndex > products.count {
-            endIndex = products.count
-        }
-        let slice = products[startIndex..<endIndex]
-        let productsOnPage = Array(slice)
-        return productsOnPage
     }
 }

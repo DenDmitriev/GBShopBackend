@@ -21,10 +21,12 @@ struct UserController: RouteCollection {
         }
     }
     
-    /// Get user func by id
-    ///
-    /// Path method get http://api/users/<user_id>
-    /// - Returns: User model
+    /**
+     Get user func by id
+     
+     Path method get http://api/users/<user_id>
+     - Returns: `User` model
+     */
     func user(req: Request) async throws -> User {
         guard let id = req.parameters.get("id") else {
             throw Abort(.internalServerError)
@@ -34,11 +36,12 @@ struct UserController: RouteCollection {
             .get()
         return user
     }
-    
-    /// Delete user func by id
-    ///
-    /// Path method delete http://api/users/<user_id>
-    /// - Returns: HTTPStatus
+    /**
+     Delete user func by id
+     
+     Path method delete http://api/users/<user_id>
+     - Returns: HTTPStatus
+     */
     func delete(req: Request) async throws -> HTTPStatus {
         guard let user = try await User.find(req.parameters.get("id"), on: req.db) else {
             throw Abort(.notFound)
@@ -47,16 +50,18 @@ struct UserController: RouteCollection {
         return .noContent
     }
     
-    /// Registration new user func
-    ///
-    /// Path method post http://api/users/register
-    ///
-    /// - Parameter name: String name of user
-    /// - Parameter password: String password of user
-    /// - Parameter confirmPassword: String confirmPassword of user
-    /// - Parameter email: String email of user
-    /// - Parameter creditCard: String number credit card of user
-    /// - Returns: RegisterUserResult model with value result: Int, userMessage: String
+    /**
+     Registration new user func
+     
+     Path method post http://api/users/register
+     
+     - Parameter name: String name of user
+     - Parameter password: String password of user
+     - Parameter confirmPassword: String confirmPassword of user
+     - Parameter email: String email of user
+     - Parameter creditCard: String number credit card of user
+     - Returns: `RegisterUserResult` model with value result: Int, userMessage: String
+     */
     func register(req: Request) async throws -> RegisterUserResult {
         do {
             try User.Create.validate(content: req)
@@ -91,17 +96,19 @@ struct UserController: RouteCollection {
                                   userMessage: "Регистрация \(user.name) прошла успешно!")
     }
     
-    /// Update user func
-    ///
-    /// Update witput password
-    /// Path method post http://api/users/update or put http://api/users/<user_id>
-    ///
-    /// - Parameter id: UUID user for find in database. This value can't update
-    /// - Parameter email: String email of user
-    /// - Parameter password: String password of user
-    /// - Parameter confirmPassword: String confirmPassword of user
-    /// - Parameter creditCard: String number credit card of user
-    /// - Returns: ChangeUserDataResult model with value result: Int
+    /**
+     Update user func
+     
+     Update witput password
+     Path method post http://api/users/update or put http://api/users/<user_id>
+     
+     - Parameter id: UUID user for find in database. This value can't update
+     - Parameter email: String email of user
+     - Parameter password: String password of user
+     - Parameter confirmPassword: String confirmPassword of user
+     - Parameter creditCard: String number credit card of user
+     - Returns: `ChangeUserDataResult` model with value result: Int
+     */
     func update(req: Request) async throws -> ChangeUserDataResult {
         do {
             try User.Update.validate(content: req)

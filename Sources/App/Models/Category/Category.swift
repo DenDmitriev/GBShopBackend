@@ -8,9 +8,8 @@
 import Fluent
 import Vapor
 
-final class ProductCategory: Model, Content, Codable {
-    static let schema = "products_category"
-    static let productPerPage: Int = 10
+final class Category: Model, Content, Codable {
+    static let schema = "categories"
     
     @ID(key: .id) var id: UUID?
     
@@ -26,5 +25,22 @@ final class ProductCategory: Model, Content, Codable {
         var fieldKey: FieldKey {
             return FieldKey(stringLiteral: self.rawValue)
         }
+    }
+    
+    init() { }
+    
+    init(id: UUID? = nil,
+         name: String,
+         description: String) {
+        self.id = id
+        self.name = name
+        self.description = description
+    }
+}
+
+extension Category {
+    struct AddProductCategory: Content {
+        let name: String
+        let description: String
     }
 }
