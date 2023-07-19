@@ -1,5 +1,5 @@
 //
-//  CreateProductCategory.swift
+//  CreateCategory.swift
 //  
 //
 //  Created by Denis Dmitriev on 29.06.2023.
@@ -7,11 +7,11 @@
 
 import Fluent
 
-struct CreateProductCategory: AsyncMigration {
-    typealias Key = ProductCategory.Keys
+struct CreateCategory: AsyncMigration {
+    typealias Key = Category.Keys
     
     func prepare(on database: FluentKit.Database) async throws {
-        try await database.schema(ProductCategory.schema)
+        try await database.schema(Category.schema)
             .id()
             .field(Key.name.fieldKey, .string, .required)
             .field(Key.description.fieldKey, .string, .required)
@@ -20,7 +20,8 @@ struct CreateProductCategory: AsyncMigration {
     }
     
     func revert(on database: Database) async throws {
-        try await database.schema(ProductCategory.schema).delete()
+//        try await database.schema("products_category").delete()
+        try await database.schema(Category.schema).delete()
     }
     
 }

@@ -13,12 +13,12 @@ final class Review: Model, Content {
     
     @ID(key: .id) var id: UUID?
     
-    @Parent(key: Key.user.fieldKey) var user: User
-    @Parent(key: Key.product.fieldKey) var product: Product
-    
     @Field(key: Key.value.fieldKey) var value: String
     @Field(key: Key.rating.fieldKey) var rating: Int
     @Timestamp(key: Key.createdAt.fieldKey, on: .create) var createdAt: Date?
+    
+    @Parent(key: Key.user.fieldKey) var user: User
+    @Parent(key: Key.product.fieldKey) var product: Product
     
     enum Key: String {
         case user = "user_id"
@@ -34,7 +34,11 @@ final class Review: Model, Content {
     
     init() {}
     
-    init(id: UUID? = nil, value: String, userID: User.IDValue, productID: Product.IDValue, rating: Int) {
+    init(id: UUID? = nil,
+         value: String,
+         userID: User.IDValue,
+         productID: Product.IDValue,
+         rating: Int) {
         self.id = id
         self.value = value
         self.rating = rating

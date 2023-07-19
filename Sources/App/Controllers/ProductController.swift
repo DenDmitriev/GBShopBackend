@@ -34,7 +34,7 @@ struct ProductController: RouteCollection {
 
         let categoryID = productsRequest.category
         
-        guard let category = try await ProductCategory.find(categoryID, on: req.db) else {
+        guard let category = try await Category.find(categoryID, on: req.db) else {
             return .init(result: 0, errorMessage: "Такой категории товаров не существует.")
         }
         
@@ -82,7 +82,8 @@ struct ProductController: RouteCollection {
      Path method post http://api/products/add
      - Parameter id: UUID of product
      - Parameter name: Name of product
-     - Parameter price: Price product
+     - Parameter price: Double type price product
+     - Parameter discount: Int8 Price discount
      - Parameter description: Description product
      - Parameter categoryID: ID category for product
      - Returns: AddProductResult with value result: Int.
@@ -91,7 +92,7 @@ struct ProductController: RouteCollection {
         let addProduct = try req.content.decode(Product.AddProduct.self)
         
         let categoryID = addProduct.categoryID
-        guard let category = try await ProductCategory.find(categoryID, on: req.db)
+        guard let category = try await Category.find(categoryID, on: req.db)
         else {
             return .init(result: 0, errorMessage: "Такой категории товаров не существует.")
         }
@@ -104,7 +105,9 @@ struct ProductController: RouteCollection {
         }
         let product = Product(name: addProduct.name,
                               price: addProduct.price,
+                              discount: addProduct.discount,
                               description: addProduct.description,
+                              image: addProduct.image,
                               categoryID: category.id)
         try await product.create(on: req.db)
         return .init(result: 1)
@@ -117,6 +120,7 @@ struct ProductController: RouteCollection {
      - Parameter id: UUID of product
      - Parameter name: Name of product
      - Parameter price: Price product
+     - Parameter discount: Int8 Price discount
      - Parameter description: Description product
      - Parameter categoryID: ID category for product
      - Returns: AddProductResult with value result: Int.
@@ -129,6 +133,7 @@ struct ProductController: RouteCollection {
         }
         product.name = productRequest.name
         product.price = productRequest.price
+        product.discount = productRequest.discount
         product.description = productRequest.description
         product.$category.id = productRequest.categoryID
         try await product.save(on: req.db)

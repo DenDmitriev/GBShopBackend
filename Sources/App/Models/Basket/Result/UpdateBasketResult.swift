@@ -1,22 +1,22 @@
 //
-//  CategoryResult.swift
+//  AddToBasketResult.swift
 //  
 //
-//  Created by Denis Dmitriev on 30.06.2023.
+//  Created by Denis Dmitriev on 07.07.2023.
 //
 
 import Vapor
 
-struct CategoryResult: Content {
+struct UpdateBasketResult: Content {
     let result: Int
-    let category: Category?
+    let userMessage: String?
     let errorMessage: String?
     
     init(result: Int,
-         category: Category? = nil,
+         userMessage: String? = nil,
          errorMessage: String? = nil) {
         self.result = result
-        self.category = category
+        self.userMessage = userMessage
         self.errorMessage = errorMessage
     }
 }

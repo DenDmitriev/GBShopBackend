@@ -1,22 +1,22 @@
 //
-//  CategoryResult.swift
+//  BasketResult.swift
 //  
 //
-//  Created by Denis Dmitriev on 30.06.2023.
+//  Created by Denis Dmitriev on 07.07.2023.
 //
 
 import Vapor
 
-struct CategoryResult: Content {
+struct BasketResult: Content {
     let result: Int
-    let category: Category?
+    let basket: Basket.Public?
     let errorMessage: String?
     
     init(result: Int,
-         category: Category? = nil,
+         basket: Basket.Public? = nil,
          errorMessage: String? = nil) {
         self.result = result
-        self.category = category
+        self.basket = basket
         self.errorMessage = errorMessage
     }
 }

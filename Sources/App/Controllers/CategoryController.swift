@@ -25,8 +25,8 @@ struct CategoryController: RouteCollection {
      Path method get http://api/categories/all
      - Returns: All Categories array
      */
-    func all(req: Request) async throws -> [ProductCategory] {
-        try await ProductCategory.query(on: req.db).all() // .with(\.$products)
+    func all(req: Request) async throws -> [Category] {
+        try await Category.query(on: req.db).all() // .with(\.$products)
     }
     
     /**
@@ -39,14 +39,14 @@ struct CategoryController: RouteCollection {
      - Returns: AddCategoryResult with value result: Int, category: ProductCategory.
      */
     func add(req: Request) async throws -> AddCategoryResult {
-        let addProductCategory = try req.content.decode(ProductCategory.AddProductCategory.self)
-        guard ((try await ProductCategory.query(on: req.db)
+        let addProductCategory = try req.content.decode(Category.AddProductCategory.self)
+        guard ((try await Category.query(on: req.db)
             .filter(\.$name == addProductCategory.name)
             .first()) == nil)
         else {
             return .init(result: 0, errorMessage: "Категория c названием \(addProductCategory.name) уже существует")
         }
-        let category = ProductCategory(name: addProductCategory.name,
+        let category = Category(name: addProductCategory.name,
                                        description: addProductCategory.description)
         try await category.create(on: req.db)
         return .init(result: 1, category: category)
@@ -67,7 +67,7 @@ struct CategoryController: RouteCollection {
             throw Abort(.badRequest)
         }
         
-        guard let category = try await ProductCategory.find(id, on: req.db) else {
+        guard let category = try await Category.find(id, on: req.db) else {
             return .init(result: 0, errorMessage: "Такой категории не существует.")
         }
         
@@ -81,7 +81,7 @@ struct CategoryController: RouteCollection {
      - Returns: HTTPStatus
      */
     func delete(req: Request) async throws -> HTTPStatus {
-        guard let category = try await ProductCategory.find(req.parameters.get("id"), on: req.db) else {
+        guard let category = try await Category.find(req.parameters.get("id"), on: req.db) else {
             throw Abort(.notFound)
         }
         try await category.delete(on: req.db)

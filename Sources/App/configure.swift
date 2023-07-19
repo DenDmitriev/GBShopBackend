@@ -8,8 +8,8 @@ public func configure(_ app: Application) async throws {
     // uncomment to serve files from /Public folder
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
-    let databasePath = app.directory.workingDirectory + "data/db.sqlite"
-//    let databasePath = "/data/db.sqlite"
+//    let databasePath = app.directory.workingDirectory + "data/db.sqlite"
+    let databasePath = "/data/db.sqlite"
     print("database exists on path", databasePath, FileManager.default.fileExists(atPath: databasePath))
     app.databases.use(.sqlite(.file(databasePath)), as: .sqlite)
 
@@ -17,11 +17,12 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateUser())
     app.migrations.add(UserToken.Migration())
     app.migrations.add(CreateProduct())
-    app.migrations.add(CreateProductCategory())
     app.migrations.add(CreateReviews())
+    app.migrations.add(CreateCategory())
+    app.migrations.add(CreateBasket())
     
-    try await app.autoMigrate()
-//    try await app.autoRevert()
+    try await app.autoRevert()
+//    try await app.autoMigrate()
 
     // register routes
     try routes(app)
