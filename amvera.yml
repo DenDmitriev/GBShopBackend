@@ -6,6 +6,6 @@
 #
 
 run:
-  command: /Sources/App/serve
+  command: /App/serve
   args: --env production --hostname 0.0.0.0 --port 8080
   containerPort: 8080
