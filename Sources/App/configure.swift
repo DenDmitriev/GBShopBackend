@@ -21,7 +21,6 @@ public func configure(_ app: Application) async throws {
 //    let databasePath = app.directory.workingDirectory + "data/db.sqlite"
     
     let databasePath = "/data/db.sqlite"
-    
     print("database exists on path", databasePath, FileManager.default.fileExists(atPath: databasePath))
     app.databases.use(.sqlite(.file(databasePath)), as: .sqlite)
 
