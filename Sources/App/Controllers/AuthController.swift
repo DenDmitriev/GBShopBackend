@@ -12,10 +12,11 @@ struct AuthController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let passwordProtected = routes.grouped(User.authenticator())
         passwordProtected.post("login", use: login)
-        passwordProtected.post("logout", use: logout)
         
         let tokenProtected = routes.grouped(UserToken.authenticator())
         tokenProtected.get("me", use: me)
+        
+        routes.post("logout", use: logout)
     }
     
     /**
@@ -30,8 +31,12 @@ struct AuthController: RouteCollection {
      - Returns: If the user token is valid, sends the result with the `MeResult` model.
      */
     func me(req: Request) async throws -> MeResult {
-        let user = try req.auth.require(User.self)
-        return .init(result: 1, user: User.Public(from: user))
+        do {
+            let user = try req.auth.require(User.self)
+            return .init(result: 1, user: User.Public(from: user))
+        } catch {
+            return .init(result: .zero, errorMessage: "Ошибка авторизации токена")
+        }
     }
     
     /**
@@ -68,7 +73,7 @@ struct AuthController: RouteCollection {
      - Returns: `LogoutResult` model with value result: Int.
      */
     func logout(req: Request) async throws -> LogoutResult {
-        let logoutRequest = try req.query.decode(LogoutRequest.self)
+        let logoutRequest = try req.content.decode(LogoutRequest.self)
         let id = logoutRequest.id
         
         guard

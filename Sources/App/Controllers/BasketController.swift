@@ -14,6 +14,7 @@ struct BasketController: RouteCollection {
         baskets.get("get", use: getBasket)
         baskets.post("add", use: addToBasket)
         baskets.post("delete", use: deleteFromBasket)
+        baskets.post("payment", use: payment)
     }
     
     /**
@@ -35,10 +36,10 @@ struct BasketController: RouteCollection {
         let productIDs = [Product.IDValue](repeating: addToBasketRequest.productID,
                                            count: addToBasketRequest.count)
         
-        if user.$basket.value == nil {
+        if try await user.$basket.get(on: req.db) == nil {
             try await createBasket(with: productIDs, for: user, on: req.db)
         } else {
-            try await updateBasket(with: productIDs, for: user, with: .add, on: req.db)
+            try await updateBasket(with: addToBasketRequest.productID, for: user, with: .add, on: req.db)
         }
         
         return .init(result: 1, userMessage: "Товар успешно добавлен в корзину.")
@@ -60,10 +61,8 @@ struct BasketController: RouteCollection {
         else {
             return .init(result: 0, errorMessage: "Пользователь не найден.")
         }
-        let productIDs = [Product.IDValue](repeating: deleteFromBasketRequest.productID,
-                                           count: deleteFromBasketRequest.count)
         
-        try await updateBasket(with: productIDs, for: user, with: .delete, on: req.db)
+        try await updateBasket(with: deleteFromBasketRequest.productID, for: user, with: .delete, on: req.db)
         
         return .init(result: 1, userMessage: "Товар успешно удален из корзины.")
     }
@@ -90,13 +89,59 @@ struct BasketController: RouteCollection {
         return .init(result: 1, basket: basketPublic)
     }
     
+    /**
+     Payment user basket
+     
+     Post method by path  http://api/baskets/payment
+     - Parameter userID: UUID of user
+     - Returns: `PaymentResult` model
+     */
+    func payment(req: Request) async throws -> PaymentResult {
+        let paymentRequest = try req.content.decode(PaymentBasketRequest.self)
+        guard
+            let user = try await User.find(paymentRequest.userID, on: req.db),
+            let basket = try await user.$basket.get(on: req.db)
+        else {
+            return .init(result: .zero, errorMessage: "Basket is empty")
+        }
+        
+        let order = try await createOrder(from: basket, in: req.db)
+        let totalPrice = try await totalPrice(for: basket, in: req.db)
+        let totalWithDiscount = totalPrice.calculateDiscountPrice()
+        
+        let orderService = OrderService(database: req.db)
+        let paymentResult = try orderService.payment(user: user, order: order, total: totalWithDiscount)
+        
+        return .init(result: paymentResult.result,
+                     receipt: paymentResult.receipt,
+                     total: paymentResult.total,
+                     errorMessage: paymentResult.error)
+    }
+    
     // MARK: Private Functions
+    
+    private func createOrder(from basket: Basket, in database: Database) async throws -> [Product: Int] {
+        var order: [Product: Int] = [:]
+        
+        for productID in basket.products {
+            let product = try await Product.find(productID, on: database)
+            guard let product = product else { continue }
+            if var count = order[product] {
+                count += 1
+                order[product] = count
+            } else {
+                order[product] = 1
+            }
+        }
+        
+        return order
+    }
     
     private enum Action {
         case add, delete
     }
     
-    private func updateBasket(with productIDs: [Product.IDValue],
+    private func updateBasket(with productID: Product.IDValue,
                               for user: User,
                               with action: Action,
                               on database: Database) async throws {
@@ -104,12 +149,10 @@ struct BasketController: RouteCollection {
         let basket = try await user.$basket.get(on: database)
         switch action {
         case .add:
-            basket?.products.append(contentsOf: productIDs)
+            basket?.products.append(productID)
         case .delete:
-            productIDs.forEach { productID in
-                if let index = basket?.products.firstIndex(of: productID) {
-                    basket?.products.remove(at: index)
-                }
+            if let index = basket?.products.firstIndex(of: productID) {
+                basket?.products.remove(at: index)
             }
         }
         

@@ -8,7 +8,8 @@
 import Fluent
 import Vapor
 
-final class Product: Model, Content, Codable {
+final class Product: Model, Content, Codable, Hashable {
+    
     static let schema = "products"
     
     @ID(key: .id) var id: UUID?
@@ -56,6 +57,14 @@ final class Product: Model, Content, Codable {
         self.description = description
         self.image = image
         self.$category.id = categoryID
+    }
+    
+    static func == (lhs: Product, rhs: Product) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 

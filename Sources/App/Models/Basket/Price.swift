@@ -17,7 +17,7 @@ struct Price: Content {
         self.discount = Int8(discount)
     }
     
-    static func calculateDiscount(price: Double, discount: Int) -> Double {
+    func calculateDiscountPrice() -> Double {
         let part = Decimal(discount) / 100
         let discountPrice = (1 - part) * Decimal(price)
         return NSDecimalNumber(decimal: discountPrice)

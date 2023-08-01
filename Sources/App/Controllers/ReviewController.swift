@@ -32,14 +32,18 @@ struct ReviewController: RouteCollection {
      */
     func addReview(req: Request) async throws -> AddReviewResult {
         let addReview = try req.content.decode(Review.AddReview.self)
+        // TODO: add check for exist product and user
         
         let review = Review(value: addReview.review,
                             userID: addReview.userID,
                             productID: addReview.productID,
                             rating: addReview.rating)
-        try await review.create(on: req.db)
-        
-        return .init(result: 1)
+        do {
+            try await review.create(on: req.db)
+            return .init(result: 1)
+        } catch {
+            return .init(result: .zero)
+        }
     }
     
     /**
