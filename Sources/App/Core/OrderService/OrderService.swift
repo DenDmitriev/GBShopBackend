@@ -31,8 +31,9 @@ class OrderService {
     
     private func checkTotal(order: [Product: Int], total: Double) -> Bool {
         let checkTotal: Double = order.map { product, count in
-            let priceForOne = (1 - Double(product.discount) / 100) * product.price
-            return priceForOne * Double(count)
+            let priceForOne = (1 - Decimal(product.discount) / 100) * Decimal(product.price)
+            let price = priceForOne * Decimal(count)
+            return NSDecimalNumber(decimal: price).doubleValue
         }.reduce(0) { partialResult, price in
             partialResult + price
         }
