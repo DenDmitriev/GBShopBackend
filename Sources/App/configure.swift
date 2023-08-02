@@ -30,11 +30,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateProduct())
     app.migrations.add(CreateReviews())
     app.migrations.add(CreateCategory())
-//    app.migrations.add(CreateBasket())
-    
-    let basketMigration = CreateBasket()
-    try await basketMigration.revert(on: app.db)
-    try await basketMigration.prepare(on: app.db)
+    app.migrations.add(CreateBasket())
     
     try await app.autoMigrate()
 
