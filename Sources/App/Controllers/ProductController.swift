@@ -80,11 +80,11 @@ struct ProductController: RouteCollection {
      Add new product method to category
      
      Path method post http://api/products/add
-     - Parameter id: UUID of product
      - Parameter name: Name of product
      - Parameter price: Double type price product
      - Parameter discount: Int8 Price discount
      - Parameter description: Description product
+     - Parameter image: URL
      - Parameter categoryID: ID category for product
      - Returns: AddProductResult with value result: Int.
      */

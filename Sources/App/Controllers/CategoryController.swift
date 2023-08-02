@@ -35,7 +35,6 @@ struct CategoryController: RouteCollection {
      Path method post http://api/categories/add
      - Parameter name: Name of product
      - Parameter description: Description of product
-     - Parameter products: Leave blank
      - Returns: AddCategoryResult with value result: Int, category: ProductCategory.
      */
     func add(req: Request) async throws -> AddCategoryResult {
@@ -77,7 +76,7 @@ struct CategoryController: RouteCollection {
     /**
      Delete category by id
      
-     Path method delete http://api/products/<category_id>
+     Path method delete http://api/categories/<category_id>
      - Returns: HTTPStatus
      */
     func delete(req: Request) async throws -> HTTPStatus {
