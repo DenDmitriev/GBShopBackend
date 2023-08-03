@@ -94,6 +94,7 @@ struct BasketController: RouteCollection {
      
      Post method by path  http://api/baskets/payment
      - Parameter userID: UUID of user
+     - Parameter total: Order total price
      - Returns: `PaymentResult` model
      */
     func payment(req: Request) async throws -> PaymentResult {
@@ -108,6 +109,11 @@ struct BasketController: RouteCollection {
         let order = try await createOrder(from: basket, in: req.db)
         let totalPrice = try await totalPrice(for: basket, in: req.db)
         let totalWithDiscount = totalPrice.calculateDiscountPrice()
+        let clientPrice = paymentRequest.total
+        
+        if clientPrice != totalWithDiscount {
+            return .init(result: .zero, errorMessage: "Сумма заказа изменилась")
+        }
         
         let orderService = OrderService(database: req.db)
         let paymentResult = try orderService.payment(user: user, order: order, total: totalWithDiscount)
@@ -195,7 +201,8 @@ struct BasketController: RouteCollection {
         for id in basket.products {
             do {
                 if let product = try await Product.find(id, on: database) {
-                    total += Decimal(product.price)
+                    let discount = Int(product.discount)
+                    total += Decimal(product.price.discount(discount))
                 } else {
                     notAvailable.append(id)
                 }

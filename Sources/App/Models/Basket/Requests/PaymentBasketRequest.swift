@@ -9,4 +9,5 @@ import Vapor
 
 struct PaymentBasketRequest: Content {
     let userID: UUID
+    let total: Double
 }

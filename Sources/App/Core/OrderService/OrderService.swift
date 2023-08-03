@@ -19,8 +19,8 @@ class OrderService {
     func payment(user: User, order: [Product: Int], total: Double) throws -> ReceiptResult {
         guard checkTotal(order: order, total: total) else { throw PaymentError.total }
         let receipt = order.map { product, count in
-            let price = (1 - Double(product.discount) / 100) * product.price
-            return ReceiptItem(name: product.name, count: count, price: price)
+            let discountedPrice = product.price.discount(Int(product.discount))
+            return ReceiptItem(name: product.name, count: count, price: discountedPrice)
         }
         let mockReceiptResult = ReceiptResult(result: 1, receipt: receipt, total: total, error: nil)
         if mockReceiptResult.result == 1 {
@@ -31,8 +31,8 @@ class OrderService {
     
     private func checkTotal(order: [Product: Int], total: Double) -> Bool {
         let checkTotal: Double = order.map { product, count in
-            let priceForOne = (1 - Decimal(product.discount) / 100) * Decimal(product.price)
-            let price = priceForOne * Decimal(count)
+            let priceForOne = product.price.discount(Int(product.discount))
+            let price = Decimal(priceForOne) * Decimal(count)
             return NSDecimalNumber(decimal: price).doubleValue
         }.reduce(0) { partialResult, price in
             partialResult + price
