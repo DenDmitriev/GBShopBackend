@@ -59,7 +59,7 @@ extension Review {
         
         static func makePublicReviews(review: Review) -> Public {
             return .init(id: review.id,
-                         reviewer: review.$user.name,
+                         reviewer: review.user.name,
                          review: review.value,
                          rating: review.rating,
                          productID: review.$product.id,
