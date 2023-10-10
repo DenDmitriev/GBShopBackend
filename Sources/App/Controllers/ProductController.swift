@@ -42,6 +42,7 @@ struct ProductController: RouteCollection {
         let page = productsRequest.page
         let products = try await category.$products
             .query(on: req.db)
+            .sort(\.$name)
             .page(withIndex: page, size: per)
         
         let publicProducts = products

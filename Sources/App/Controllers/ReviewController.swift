@@ -88,6 +88,7 @@ struct ReviewController: RouteCollection {
         let reviews = try await product.$reviews
             .query(on: req.db)
             .with(\.$user)
+            .sort(\.$createdAt)
             .page(withIndex: page, size: per)
         
         
