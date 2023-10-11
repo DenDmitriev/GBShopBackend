@@ -11,6 +11,12 @@ Vapor
 SQLite
 
 # API
+ - [Authorization](#Authorization)
+ - [Basket](#basket)
+ - [Category](#category)
+ - [Product](#product)
+ - [Review](#review)
+ - [User](#user)
 
 ## Authorization
  - [login](#login)
