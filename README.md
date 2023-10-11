@@ -294,7 +294,7 @@ Result
  - [delete](#delete)
 
 ### all
-     Categories
+Categories
 
 ```http
 GET /categories/all HTTP/1.1
